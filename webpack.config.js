@@ -3,6 +3,9 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 const path = `${__dirname}/dist`;
 
+const ploneExcludes = /(\+\+resource\+\+|\+\+theme\+\+)/;
+const jsExcludes = /(\/node_modules\/|test\.js$|\.spec\.js$)/;
+
 
 module.exports = {
   entry: [
@@ -20,7 +23,7 @@ module.exports = {
   module: {
     rules: [{
       test: /\.js$/,
-      exclude: /(\+\+resource\+\+|\/node_modules\/|test\.js$|\.spec\.js$)/,
+      exclude: new RegExp(`${ploneExcludes.source}|${jsExcludes.source}`),
       use: 'babel-loader',
     }, {
       test: /\.scss$/,
@@ -30,7 +33,7 @@ module.exports = {
           {
             loader: 'css-loader',
             options: {
-              url: (url, resourcePath) => /\+\+resource\+\+/.test(url)
+              url: (url, resourcePath) => ploneExcludes.test(url)
             }
           },
           'postcss-loader',
@@ -39,7 +42,7 @@ module.exports = {
       }),
     }, {
       test: /\.(gif|png|jpe?g)$/i,
-      exclude: /\+\+resource\+\+/,
+      exclude: ploneExcludes,
       use: [
         {
           loader: 'file-loader',
@@ -69,8 +72,7 @@ module.exports = {
       ]
     }, {
       test: /\.svg/,
-      exclude: /\+\+resource\+\+/,
-      exclude: /node_modules/,
+      exclude: ploneExcludes,
       use: 'svg-url-loader',
     }]
   },
